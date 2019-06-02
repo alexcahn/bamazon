@@ -81,10 +81,7 @@ function selectProducts() {
 
 //Function to process the purcharse
 function processingPurchase(id, quantity) {
-    connection.query('SELECT * FROM products WHERE item_id=?', [id], function (
-        err,
-        res
-    ) {
+    connection.query('SELECT * FROM products WHERE item_id=?', [id], function (err, res) {
         if (err) {
             throw err;
         }
