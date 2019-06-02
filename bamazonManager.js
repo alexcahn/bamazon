@@ -64,6 +64,7 @@ function printProductsFunction() {
                 '--------------------------------------------------------------------'
             );
         }
+        restart()
     });
 }
 
@@ -81,64 +82,10 @@ function lowInventory() {
                 console.log(res[i].product_name + " is low on stock with only " + res[i].stock_quantity + " items available.")
             }
         }
+        restart()
     })
 }
 
-
-
-// Function to add inventory
-function addInventory() {
-    connection.query('SELECT * FROM products', function (err, res) {
-        inquirer
-            .prompt([
-                {
-                    name: 'ID',
-                    type: 'input',
-                    message: 'What is the ID of the product you would like to add inventory to?',
-                    validate: function (value) {
-                        if (isNaN(value) === false) {
-                            return true;
-                        }
-                        return false;
-                    }
-                },
-                {
-                    name: 'Quantity',
-                    type: 'input',
-                    message: 'How many units would you like to add?',
-                    validate: function (value) {
-                        if (isNaN(value) === false) {
-                            return true;
-                        }
-                        return false;
-                    }
-                }
-            ])
-            .then(function (answer, id) {
-                connection.query('SELECT * FROM products WHERE item_id=?', [id], function (err, res) {
-                if (err) {
-                    throw err;
-                }
-                var id = answer.ID;
-                var quantity = answer.Quantity
-                var currentStock;
-
-                for (var i = 0; i < res.length; i++){
-                    if (id == res[i])
-                currentStock = res[i].stock_quantity + quantity
-                console.log(currentStock)
-                    }
-                    // updateDb(currentStock, id)
-                })
-            })
-})
-}
-
-// Function to update db
-function updateDb(currentStock, id) {
-    connection.query('UPDATE products SET stock_quantity=? WHERE item_id=?', [currentStock, id], function (err, res) { }
-    );
-}
 
 
 // Function to add new product
@@ -205,8 +152,78 @@ function addAnotherNewProduct() {
 }
 
 
-// Function to return to 
+// Function to return to main menu
+function restart(){
+    inquirer
+    .prompt([
+        {
+            name: 'Restart',
+            type: 'confirm',
+            message: 'Would you like to return to the main menu?',
+        }
+    ])
+    .then(function (answer) {
+        var restart = answer.Restart;
+        if (restart == true) {
+            menuOptions();
+        } else {
+            connection.end();
+        }
+    })
+}
 
 
+// Function to add inventory
+function addInventory() {
+    connection.query('SELECT * FROM products', function (err, res) {
+        inquirer
+            .prompt([
+                {
+                    name: 'ID',
+                    type: 'input',
+                    message: 'What is the ID of the product you would like to add inventory to?',
+                    validate: function (value) {
+                        if (isNaN(value) === false) {
+                            return true;
+                        }
+                        return false;
+                    }
+                },
+                {
+                    name: 'Quantity',
+                    type: 'input',
+                    message: 'How many units would you like to add?',
+                    validate: function (value) {
+                        if (isNaN(value) === false) {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            ])
+            .then(function (answer, id) {
+                connection.query('SELECT * FROM products WHERE item_id=?', [id], function (err, res) {
+                if (err) {
+                    throw err;
+                }
+                var id = answer.ID;
+                var quantity = answer.Quantity
+                var currentStock;
 
+                for (var i = 0; i < res.length; i++){
+                    if (id == res[i])
+                currentStock = res[i].stock_quantity + quantity
+                console.log(currentStock)
+                    }
+                    // updateDb(currentStock, id)
+                })
+            })
+})
+}
+
+// Function to update db
+function updateDb(currentStock, id) {
+    connection.query('UPDATE products SET stock_quantity=? WHERE item_id=?', [currentStock, id], function (err, res) { }
+    );
+}
 // Function to process adding more items
