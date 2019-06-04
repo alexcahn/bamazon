@@ -26,14 +26,23 @@ function menuOptions() {
             },
         ])
         .then(function (answer) {
-            if (answer.menu === "View Products for Sale") {
-                printProductsFunction();
-            } else if (answer.menu === "View Low Inventory") {
-                lowInventory();
-            } else if (answer.menu === "Add to Inventory") {
-                addInventory();
-            } else if (answer.menu === "Add New Product") {
-                addNewProduct();
+
+            switch (answer.menu) {
+                case "View Products for Sale":
+                    printProductsFunction()
+                    break;
+
+                case "View Low Inventory":
+                    lowInventory()
+                    break;
+
+                case "Add to Inventory":
+                    addInventory()
+                    break;
+
+                case "Add New Product":
+                    addNewProduct()
+                    break;
             }
         })
 }
