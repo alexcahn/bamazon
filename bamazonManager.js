@@ -229,6 +229,27 @@ function processingAdd(id, quantity) {
         var newQuantity = res[0].stock_quantity + quantityNumber; 
         updateDb(newQuantity, id);
         console.log("You successfully added " + quantityNumber + " to " + res[0].product_name + "!")
-        restart()
+        getNewInput();
     });
+}
+
+
+// function to ask to add another product
+function getNewInput() {
+    inquirer
+        .prompt([
+            {
+                name: 'NewInput',
+                type: 'confirm',
+                message: 'Would you like to add another product?',
+            }
+        ])
+        .then(function (answer) {
+            var addAgain = answer.NewInput;
+            if (addAgain == true) {
+                addInventory();
+            } else {
+                connection.end();
+            }
+        })
 }
