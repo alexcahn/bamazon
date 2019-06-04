@@ -36,7 +36,7 @@ function menuOptions() {
                 lowInventory();
             } else if (answer.menu === "Add to Inventory") {
                 addInventory();
-            }else if (answer.menu === "Add New Product"){
+            } else if (answer.menu === "Add New Product") {
                 addNewProduct();
             }
         })
@@ -89,47 +89,47 @@ function lowInventory() {
 
 
 // Function to add new product
-function addNewProduct(){
+function addNewProduct() {
     inquirer
-    .prompt([
-        {
-            name: 'Name',
-            type: 'input',
-            message: 'What is the name of the product you would like to add?',
-        },
-        {
-            name: 'Department',
-            type: 'input',
-            message: 'Which department does this product belong?',
-        },
-        {
-            name: 'Price',
-            type: 'input',
-            message: 'How much does this product cost?',
-        },
-        {
-            name: 'Quantity',
-            type: 'input',
-            message: 'What is the stock quantity you would like to add?',
-        }
-    ])
-    .then(function(answer) {
-        // when finished prompting, insert a new item into the db with that info
-        connection.query(
-          "INSERT INTO products SET ?",
-          {
-            product_name: answer.Name,
-            department_name: answer.Department,
-            price: answer.Price,
-            stock_quantity: answer.Quantity
-          },
-          function(err) {
-            if (err) throw err;
-            console.log("Your Product was created successfully!");
-            addAnotherNewProduct();
-          }
-        );
-      });
+        .prompt([
+            {
+                name: 'Name',
+                type: 'input',
+                message: 'What is the name of the product you would like to add?',
+            },
+            {
+                name: 'Department',
+                type: 'input',
+                message: 'Which department does this product belong?',
+            },
+            {
+                name: 'Price',
+                type: 'input',
+                message: 'How much does this product cost?',
+            },
+            {
+                name: 'Quantity',
+                type: 'input',
+                message: 'What is the stock quantity you would like to add?',
+            }
+        ])
+        .then(function (answer) {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                "INSERT INTO products SET ?",
+                {
+                    product_name: answer.Name,
+                    department_name: answer.Department,
+                    price: answer.Price,
+                    stock_quantity: answer.Quantity
+                },
+                function (err) {
+                    if (err) throw err;
+                    console.log("Your Product was created successfully!");
+                    addAnotherNewProduct();
+                }
+            );
+        });
 }
 
 function addAnotherNewProduct() {
@@ -153,23 +153,23 @@ function addAnotherNewProduct() {
 
 
 // Function to return to main menu
-function restart(){
+function restart() {
     inquirer
-    .prompt([
-        {
-            name: 'Restart',
-            type: 'confirm',
-            message: 'Would you like to return to the main menu?',
-        }
-    ])
-    .then(function (answer) {
-        var restart = answer.Restart;
-        if (restart == true) {
-            menuOptions();
-        } else {
-            connection.end();
-        }
-    })
+        .prompt([
+            {
+                name: 'Restart',
+                type: 'confirm',
+                message: 'Would you like to return to the main menu?',
+            }
+        ])
+        .then(function (answer) {
+            var restart = answer.Restart;
+            if (restart == true) {
+                menuOptions();
+            } else {
+                connection.end();
+            }
+        })
 }
 
 
@@ -201,29 +201,34 @@ function addInventory() {
                     }
                 }
             ])
-            .then(function (answer, id) {
-                connection.query('SELECT * FROM products WHERE item_id=?', [id], function (err, res) {
-                if (err) {
-                    throw err;
-                }
-                var id = answer.ID;
-                var quantity = answer.Quantity
-                var currentStock;
+                .then(function (answer) {
+                    var id = answer.ID;
+                    var quantity = answer.Quantity;
+                        processingAdd(id, quantity);
 
-                for (var i = 0; i < res.length; i++){
-                    if (id == res[i])
-                currentStock = res[i].stock_quantity + quantity
-                console.log(currentStock)
-                    }
+                    // updateDb(currentStock, id);
+                
                     // updateDb(currentStock, id)
                 })
             })
-})
-}
+    }
 
-// Function to update db
-function updateDb(currentStock, id) {
-    connection.query('UPDATE products SET stock_quantity=? WHERE item_id=?', [currentStock, id], function (err, res) { }
-    );
+    // Function to update db
+    function updateDb(newQuantity, id) {
+        connection.query('UPDATE products SET stock_quantity=? WHERE item_id=?', [newQuantity, id], function (err, res) { }
+        );
+    }
+
+    //Function to process adding inventory
+function processingAdd(id, quantity) {
+    connection.query('SELECT * FROM products WHERE item_id=?', [id], function (err, res) {
+        if (err) {
+            throw err;
+        }
+        var quantityNumber = parseInt(quantity);
+        var newQuantity = res[0].stock_quantity + quantityNumber; 
+        updateDb(newQuantity, id);
+        console.log("You successfully added " + quantityNumber + " to " + res[0].product_name + "!")
+        restart()
+    });
 }
-// Function to process adding more items
