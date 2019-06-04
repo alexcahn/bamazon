@@ -97,7 +97,6 @@ function processingPurchase(id, quantity) {
             console.log('Your total is: ' + total);
 
             getNewInput();
-
         } else {
             console.log('Insufficient Quantity, please try again.');
             selectProducts()
